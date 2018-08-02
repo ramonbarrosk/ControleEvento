@@ -5,7 +5,6 @@ class Usuario(object):
         self.endereco = endereco
         self.data_nascimento = data_nascimento
         self.senha = senha
-        
 class Evento(object):
     def __init__(self,nome_evento,sigla,descricao,local,data_inicio,data_fim,administrador_evento,valor_profissional,valor_estudante,participantes):
         self.valor_arrecadado = 0
@@ -22,11 +21,11 @@ class Evento(object):
 class AdministradorSistema(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
+        self.tipo = None
         self.admEventos = []
         self.admSistema = []
         self.eventos = []
         self.participantes = []
-       
     def cadastrarAdmEvento(self,administrador):
         self.admEventos.append(administrador)
     def cadastrarAdmSistema(self,administrador):
@@ -47,18 +46,16 @@ class AdministradorSistema(Usuario):
         
     def relatorioEvento(self,sigla_evento):
         evento = None 
-        
         for i in self.eventos:
             if i.sigla == sigla_evento:
                 evento = i
         print("Dados do Eventos:\n %s\n%s\n%s"%(i.nome,i.sigla,i.local))
-        
-                
     def deslogar(self):
         main()
 class AdministradorEvento(AdministradorSistema):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
+        self.tipo = None
     def alterarDadosPessoais(self,usuario):
         print("O que deseja alterar?\n1-Nome\n2-Endereco\n3-Data de Nascimento\n4-Senha")
         opcao = int(input())
@@ -79,11 +76,12 @@ class AdministradorEvento(AdministradorSistema):
 class ParticipanteEstudante(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
+        self.tipo = None
         
 class ParticipanteProfissional(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
-        self.tipo_participante = None
+        self.tipo = None
     def alterarDados(self):
         pass
     def listarEventosInscritos(self):
@@ -117,8 +115,39 @@ def validandoUsuario():
         print(ex.args)
     usuario = Usuario(nome,cpf,endereco,data_nascimento,senha)
     return usuario
+def validandoLogin():
+    cpf = input("Insira seu CPF(Apenas Números):")
+    senha = input("Insira sua senha:")
+    objeto = None
+    
+    for i in adm.admSistema:
+        if i.cpf==cpf and i.senha==senha:
+            objeto = i
+            
+    for i in adm.admEventos:
+        if i.cpf==cpf and i.senha==senha:
+            objeto = i
+            
+     for i in adm.participantes:
+        if i.cpf==cpf and i.senha==senha:
+            objeto = i
+    return objeto   
+    
+def admSistema(objeto):
+    print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n8-Exibidr relatório por evento\n9-Deslogar")
+    if opcao==1:
+        usuario = validandoUsuario()
+        objeto.cadastrarAdmSistema(usuario)
+        print("ADM de Sistema cadastrado com sucesso!")
+    elif opcao==2:
+        usuario = validandoUsuario()
+        objeto.cadastrarAdmEvento(usuario)
+        print("AMD de Evento cadastrado com sucesso!")
+    elif opcao==3:
+        
+    
 def main():
-    adm  = AdministradorSistema("ADM","1313","000","08/05/1995","123")
+    adm  = AdministradorSistema("ADM_MASTER","11111111111","Indefinido","08/05/1995","ADM_MASTER")
     opcao = 4
     while opcao!=3:
         print("Bem vindo ao Sistema de Eventos!\n1-Criar Conta\n2-Realizar Login\n3-Sair do Sistema")
@@ -130,23 +159,38 @@ def main():
                 opcao = int(input("Escolha um tipo de usuário->"))
                 if opcao==1:
                     usuario = validandoUsuario()
-                    nome = usuario.nome
-                    cpf = usuario.cpf
-                    endereco = usuario.endereco
-                    data_nascimento = usuario.data_nascimento
-                    senha = usuario.senha
-                    admSistema = AdministradorSistema(nome,cpf,endereco,data_nascimento,senha)
+                    admSistema = AdministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    admSistema.tipo = "ADM_SISTEMA"
                     adm.cadastrarAdmSistema(admSistema)
                     print("Administrador Sistema criado com sucesso!")
-                    
-                    
+                elif opcao==2:
+                    usuario = validandoUsuario()
+                    admEvento = AdministradorEvento(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    admdEvento.tipo = "ADM_EVENTO"
+                    adm.cadastrarAdmEvento(admEvento)
+                    print("Administrador Evento criado com sucesso!")
+                elif opcao==3:
+                    usuario = validandoUsuario()
+                    participanteEstudante = ParticipanteEstudante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    participanteEstudante.tipo = "PARTICIPANTE_ESTUDANTE"
+                    adm.participantes.append(participanteEstudante)
+                    print("Participante Estudante criado com sucesso!")
+                elif opcao==4:
+                    usuario = validandoUsuario()
+                    participanteProfissional = ParticipanteProfissional(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    participanteProfissional.tipo = "PARTICIPANTE_PROFISSIONAL"
+                    adm.participantes.append(participanteProfissional)
+                    print("Participante Profissional criado com sucesso!")
+        elif opcao==2:
+            objeto = validandoLogin()
+            if objeto==None:
+                print("Login inválido")
+            else:
+                if objeto.tipo=="ADM_SISTEMA":
+                    admSistema(objeto)
                 
             
-            
-            
-            
-            
-    
+                
 if __name__ == "__main__":
     main()
     
