@@ -1,6 +1,7 @@
 class Usuario(object):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         self.nome = nome
+        self.cpf = cpf
         self.endereco = endereco
         self.data_nascimento = data_nascimento
         self.senha = senha
@@ -24,8 +25,8 @@ class AdministradorSistema(Usuario):
         self.admEventos = []
         self.admSistema = []
         self.eventos = []
-        self.participantesEstudante = []
-        self.participantesProfissional = []
+        self.participantes = []
+       
     def cadastrarAdmEvento(self,administrador):
         self.admEventos.append(administrador)
     def cadastrarAdmSistema(self,administrador):
@@ -75,6 +76,10 @@ class AdministradorEvento(AdministradorSistema):
             usuario.senha = senha
         else:
             print("Opção inválida")
+class ParticipanteEstudante(Usuario):
+    def __init__(self,nome,cpf,endereco,data_nascimento,senha):
+        Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
+        
 class ParticipanteProfissional(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
@@ -89,33 +94,57 @@ class ParticipanteProfissional(Usuario):
         pass
     def deslogar(self):
         main()
-def validandoConta():
+def validandoUsuario():
+    usuario = None
     try:
         nome = input("Informe seu nome:")
         if len(nome)==0:
-            raise ValueError("Insira um nome por favor!")
+            raise NameError("Insira um nome por favor!")
         cpf = int(input("Informe seu cpf(Apenas Números):"))
-        if len(cpf)==0:
-            raise ValueError("Insira um CPF por favor!")
+        cpf = str(cpf)
+        if len(cpf)!=11:
+            raise NameError("Insira um CPF válido")
         endereco = input("Informe seu endereço(Cidade,Bairro,Estado,CEP):")
-        data_nascimento =  input("Informe a data de nascimento:")
-        if len(data_nascimento)==0:
-            raise ValueError("Insira a data de nascimento por favor!")
+        data_nascimento =  input("Informe a data de nascimento(DD/MM/AAAA):")
+        if len(data_nascimento)!=10:
+            raise NameError("Insira a data de nascimento por favor!")
         senha = input("Informe a senha:")
         if len(senha)==0:
-            raise ValueError("Insira uma senha por favor!")
-        tipo = input("Você é Participante Profissional ou Estudante?").upper()
-        if tipo!="PROFISSIONAL" or tipo!="ESTUDANTE":
-            raise ValueError("Apenas PROFISSIONAL OU ESTUDANTE")
-    except ValueError as ex:
-        print(ex.args())
+            raise NameError("Insira uma senha por favor!")
+    except ValueError:
+        print("Insira apenas números no CPF!")
+    except NameError as ex:
+        print(ex.args)
+    usuario = Usuario(nome,cpf,endereco,data_nascimento,senha)
+    return usuario
 def main():
+    adm  = AdministradorSistema("ADM","1313","000","08/05/1995","123")
     opcao = 4
     while opcao!=3:
         print("Bem vindo ao Sistema de Eventos!\n1-Criar Conta\n2-Realizar Login\n3-Sair do Sistema")
         opcao = int(input("Escolha uma opção->"))
         if opcao==1:
-            validandoConta()
+            opcao=9
+            while opcao!=5:
+                print("1-Administrador Sistema\n2-Administrador Evento\n3-Participante Estudante\n4-Participante Profissional\n5-Menu Inicial")
+                opcao = int(input("Escolha um tipo de usuário->"))
+                if opcao==1:
+                    usuario = validandoUsuario()
+                    nome = usuario.nome
+                    cpf = usuario.cpf
+                    endereco = usuario.endereco
+                    data_nascimento = usuario.data_nascimento
+                    senha = usuario.senha
+                    admSistema = AdministradorSistema(nome,cpf,endereco,data_nascimento,senha)
+                    adm.cadastrarAdmSistema(admSistema)
+                    print("Administrador Sistema criado com sucesso!")
+                    
+                    
+                
+            
+            
+            
+            
             
     
 if __name__ == "__main__":
