@@ -78,6 +78,22 @@ class AdministradorEvento(Usuario,AdministradorSistema):
 class ParticipanteProfissional(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
+        self.tipo_participante = None
+    def alterarDados(self):
+        pass
+    def listarEventosInscritos(self):
+        pass
+    def detalheEvento(self,sigla):
+        pass
+    def realizarInscricaoEvento(self,sigla):
+        pass
+    def deslogar(self):
+        main()
+
+def main():
+    pass
+if __name__ = "__main__":
+    main()
     
     
         
