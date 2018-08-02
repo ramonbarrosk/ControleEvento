@@ -55,7 +55,7 @@ class AdministradorSistema(Usuario):
                 
     def deslogar(self):
         main()
-class AdministradorEvento(Usuario,AdministradorSistema):
+class AdministradorEvento(AdministradorSistema):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
     def alterarDadosPessoais(self,usuario):
@@ -89,10 +89,36 @@ class ParticipanteProfissional(Usuario):
         pass
     def deslogar(self):
         main()
-
+def validandoConta():
+    try:
+        nome = input("Informe seu nome:")
+        if len(nome)==0:
+            raise ValueError("Insira um nome por favor!")
+        cpf = int(input("Informe seu cpf(Apenas Números):"))
+        if len(cpf)==0:
+            raise ValueError("Insira um CPF por favor!")
+        endereco = input("Informe seu endereço(Cidade,Bairro,Estado,CEP):")
+        data_nascimento =  input("Informe a data de nascimento:")
+        if len(data_nascimento)==0:
+            raise ValueError("Insira a data de nascimento por favor!")
+        senha = input("Informe a senha:")
+        if len(senha)==0:
+            raise ValueError("Insira uma senha por favor!")
+        tipo = input("Você é Participante Profissional ou Estudante?").upper()
+        if tipo!="PROFISSIONAL" or tipo!="ESTUDANTE":
+            raise ValueError("Apenas PROFISSIONAL OU ESTUDANTE")
+    except ValueError as ex:
+        print(ex.args())
 def main():
-    pass
-if __name__ = "__main__":
+    opcao = 4
+    while opcao!=3:
+        print("Bem vindo ao Sistema de Eventos!\n1-Criar Conta\n2-Realizar Login\n3-Sair do Sistema")
+        opcao = int(input("Escolha uma opção->"))
+        if opcao==1:
+            validandoConta()
+            
+    
+if __name__ == "__main__":
     main()
     
     
