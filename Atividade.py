@@ -1,3 +1,4 @@
+#OBJETOS DO PROGRAMA
 class Usuario(object):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         self.nome = nome
@@ -92,27 +93,44 @@ class ParticipanteProfissional(Usuario):
         pass
     def deslogar(self):
         main()
-def validandoUsuario():
+
+        
+#FUNÇÕES DE VALIDAÇÃO E O MAIN
+def verificandoCPF(adm,cpf):
+    cpfExisti = False
+    for i in adm.admSistema:
+        if i.cpf==cpf:
+            cpfExisti =  True
+    for i in adm.admEventos:
+        if i.cpf==cpf:
+            cpfExisti = True
+    for i in adm.participantes:
+        if i.cpf==cpf:
+            cpfExisti = True
+    return cpfExisti 
+def validandoUsuario(adm):
     usuario = None
-    try:
-        nome = input("Informe seu nome:")
-        if len(nome)==0:
-            raise NameError("Insira um nome por favor!")
-        cpf = int(input("Informe seu cpf(Apenas Números):"))
-        cpf = str(cpf)
-        if len(cpf)!=11:
-            raise NameError("Insira um CPF válido")
-        endereco = input("Informe seu endereço(Cidade,Bairro,Estado,CEP):")
-        data_nascimento =  input("Informe a data de nascimento(DD/MM/AAAA):")
-        if len(data_nascimento)!=10:
-            raise NameError("Insira a data de nascimento por favor!")
+    nome = input("Informe seu nome:")
+    while len(nome)==0:
+        nome = input("Por favor insira seu nome:")
+    cpf = int(input("Informe seu cpf(Apenas Números):"))
+    cpf = str(cpf)
+    while len(cpf)!=11:
+        print("Insira um CPF válido")
+        cpf = input("Informe seu cpf(Apenas Números):")
+    while (verificandoCPF(adm,cpf)):
+        print("CPF já existi, insira outro!")
+        cpf = input("Informe seu cpf(Apenas Números):")
+        
+    endereco = input("Informe seu endereço(Cidade,Bairro,Estado,CEP):")
+    data_nascimento = input("Informe a data de nascimento(DD/MM/AAAA):")
+    while len(data_nascimento)!=10:
+        print("Insira a data de nascimento por favor!")
+        data_nascimento = input("Informe a data de nascimento(DD/MM/AAAA):")
+    senha = input("Informe a senha:")
+    while len(senha)==0:
+        print("Insira uma senha por favor!")
         senha = input("Informe a senha:")
-        if len(senha)==0:
-            raise NameError("Insira uma senha por favor!")
-    except ValueError:
-        print("Insira apenas números no CPF!")
-    except NameError as ex:
-        print(ex.args)
     usuario = Usuario(nome,cpf,endereco,data_nascimento,senha)
     return usuario
 def validandoLogin():
@@ -128,10 +146,32 @@ def validandoLogin():
         if i.cpf==cpf and i.senha==senha:
             objeto = i
             
-     for i in adm.participantes:
+    for i in adm.participantes:
         if i.cpf==cpf and i.senha==senha:
             objeto = i
     return objeto   
+def validandoEvento():
+    evento = None
+    nome_evento = input()
+    while len(nome_evento)==0:
+        print("Por favor insira o nome do evento!")
+        nome_evento = input()
+    sigla = input()
+    while len(sigla==0):
+        print("Por favor insira a sigla do evento!")
+        sigla = input()
+    descricao = input("Insira a descrição do evento:")
+    local = input("Insira o local do evento:")
+    data_inicio = input("Insira a data do inicio do evento(DD/MM/AAAAA):")
+    while len(data_nascimento)!=10:
+        print("Insira a data de nascimento por favor!")
+        data_inicio = input("Informe a data de nascimento(DD/MM/AAAA):")
+    data_fim = input("Insira a data do fim do evento(DD/MM/AAAAA):")
+    while len(data_nascimento)!=10:
+        print("Insira a data de nascimento por favor!")
+        data_fim = input("Informe a data de nascimento(DD/MM/AAAA):")
+    
+    evento = Evento()
     
 def admSistema(objeto):
     print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n8-Exibidr relatório por evento\n9-Deslogar")
@@ -144,7 +184,7 @@ def admSistema(objeto):
         objeto.cadastrarAdmEvento(usuario)
         print("AMD de Evento cadastrado com sucesso!")
     elif opcao==3:
-        
+        pass
     
 def main():
     adm  = AdministradorSistema("ADM_MASTER","11111111111","Indefinido","08/05/1995","ADM_MASTER")
@@ -158,25 +198,25 @@ def main():
                 print("1-Administrador Sistema\n2-Administrador Evento\n3-Participante Estudante\n4-Participante Profissional\n5-Menu Inicial")
                 opcao = int(input("Escolha um tipo de usuário->"))
                 if opcao==1:
-                    usuario = validandoUsuario()
-                    admSistema = AdministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    usuario = validandoUsuario(adm)
+                    admSistema = AministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
                     admSistema.tipo = "ADM_SISTEMA"
                     adm.cadastrarAdmSistema(admSistema)
                     print("Administrador Sistema criado com sucesso!")
                 elif opcao==2:
-                    usuario = validandoUsuario()
+                    usuario = validandoUsuario(adm)
                     admEvento = AdministradorEvento(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
                     admdEvento.tipo = "ADM_EVENTO"
                     adm.cadastrarAdmEvento(admEvento)
                     print("Administrador Evento criado com sucesso!")
                 elif opcao==3:
-                    usuario = validandoUsuario()
+                    usuario = validandoUsuario(adm)
                     participanteEstudante = ParticipanteEstudante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
                     participanteEstudante.tipo = "PARTICIPANTE_ESTUDANTE"
                     adm.participantes.append(participanteEstudante)
                     print("Participante Estudante criado com sucesso!")
                 elif opcao==4:
-                    usuario = validandoUsuario()
+                    usuario = validandoUsuario(adm)
                     participanteProfissional = ParticipanteProfissional(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
                     participanteProfissional.tipo = "PARTICIPANTE_PROFISSIONAL"
                     adm.participantes.append(participanteProfissional)
