@@ -7,7 +7,7 @@ class Usuario(object):
         self.data_nascimento = data_nascimento
         self.senha = senha
 class Evento(object):
-    def __init__(self,nome_evento,sigla,descricao,local,data_inicio,data_fim,administrador_evento,valor_profissional,valor_estudante,participantes):
+    def __init__(self,nome_evento,sigla,descricao,local,data_inicio,data_fim,administrador_evento,valor_profissional,valor_estudante):
         self.valor_arrecadado = 0
         self.nome_evento = nome_evento
         self.sigla = sigla
@@ -33,8 +33,19 @@ class AdministradorSistema(Usuario):
         self.admSistema.append(administrador)
     def cadastrarEvento(self,evento):
         self.eventos.append(evento)
-    def removerEvento(self,evento):
-        self.eventos.remove(evento)
+    def removerEvento(self,sigla):
+        excluido = False
+        for i in self.eventos:
+            if i.sigla==sigla:
+                self.eventos.remove(evento)
+                excluido = True
+        if excluido ==True:
+            print("Evento excluído com sucesso!")
+        else:
+            print("Essa sigla não está cadastrada em nenhum evento no nosso sistema!")
+    def removerUsuario(self,cpf):
+        excluido = False
+        for i in self.partc
     def listarEventos(self):
         for i in self.eventos:
             print(i.nome_eventos,"-",i.sigla)
@@ -107,7 +118,19 @@ def verificandoCPF(adm,cpf):
     for i in adm.participantes:
         if i.cpf==cpf:
             cpfExisti = True
-    return cpfExisti 
+    return cpfExisti
+def verificandoCPFadm(adm,cpf):
+    adm = None
+    for i in adm.admEventos:
+        if i.cpf==cpf:
+            adm = i
+    return adm
+def retornaEvento(adm,sigla):
+    evento = None
+    for i in adm.eventos:
+        if i.sigla==sigla:
+            evento = i
+    return evento
 def validandoUsuario(adm):
     usuario = None
     nome = input("Informe seu nome:")
@@ -150,7 +173,7 @@ def validandoLogin():
         if i.cpf==cpf and i.senha==senha:
             objeto = i
     return objeto   
-def validandoEvento():
+def validandoEvento(adm):
     evento = None
     nome_evento = input()
     while len(nome_evento)==0:
@@ -170,8 +193,20 @@ def validandoEvento():
     while len(data_nascimento)!=10:
         print("Insira a data de nascimento por favor!")
         data_fim = input("Informe a data de nascimento(DD/MM/AAAA):")
-    
-    evento = Evento()
+    cpf = int(input("Informe o cpf do Administrador do evento:"))
+    cpf = str(cpf)
+    while len(cpf)!=11:
+        print("Insira um CPF válido")
+        cpf = input("Informe o cpf do Administrador do evento::")
+    while verificandoCPFadm(adm,cpf)==None:
+        print("CPF informado não está cadastrado como administrador de Eventos!")
+        cpf = input("Informe o cpf do Administrador do evento::")
+    admEvento = verificandoCPFadm(adm,cpf)
+    valor_participante_profissional = float(input("Informe o valor do ingresso para participante profissional:"))
+    valor_participante_estudante = float(input("Informe o valor do ingresso para participante estudante:"))
+                                            
+    evento = Evento(nome_evento,sigla,descricao,local,data_inicio,data_fim,admEvento,valor_participante_profissional,valor_participante_estudante)
+    return evento
     
 def admSistema(objeto):
     print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n8-Exibidr relatório por evento\n9-Deslogar")
@@ -184,7 +219,16 @@ def admSistema(objeto):
         objeto.cadastrarAdmEvento(usuario)
         print("AMD de Evento cadastrado com sucesso!")
     elif opcao==3:
-        pass
+        evento = validandoEvento(objeto)
+        objeto.cadastrarEvento(evento)
+        print("Evento cadastrado com sucesso")
+    elif opcao==4:
+        sigla = input("Informe a sigla do evento a ser excluído:")
+        objeto.removerEvento(sigla)
+    elif opcao==5:
+        cpf = input("Informe o cpf do usuario a ser excluído:")
+        objeto.removerUsuario(cpf)
+        
     
 def main():
     adm  = AdministradorSistema("ADM_MASTER","11111111111","Indefinido","08/05/1995","ADM_MASTER")
