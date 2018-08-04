@@ -1,4 +1,5 @@
 class Dados:
+    valor_total = 0
     eventos = []
     usuarios = []
     admEventos = []
@@ -54,10 +55,13 @@ class AdministradorSistema(Usuario):
             print("CPF não encontrado como cadastrado!")
     def listarEventos(self):
         for i in Dados.eventos:
-            print(i.nome_evento,"-",i.sigla)
+            print("=-="*15)
+            print("Nome do evento:%s\nSigla:%s"%(i.nome_evento,i.sigla))
+            print("=-="*15)
     def relatorioSistema(self):
         participantesEstudantes = 0
         participantesProfissionais = 0
+        print("=-="*15)
         for i in Dados.usuarios:
             if i.tipo=="PARTICIPANTE_ESTUDANTE":
                 participantesEstudantes+=1
@@ -68,13 +72,17 @@ class AdministradorSistema(Usuario):
         print("Número de participantes Estudantes: %i"%participantesEstudantes)
         print("Número de participantes Profissionais: %i"%participantesProfissionais)
         print("Número de eventos cadastrados: %i"%len(Dados.eventos))
+        print("Valor arrecadado no total: %.2f"%Dados.valor_total)
+        print("=-="*15)
     def relatorioEvento(self,sigla_evento):
         evento = None 
         for i in Dados.eventos:
             if i.sigla == sigla_evento:
                 evento = i
         if evento!=None:
-            print("Dados do Eventos:\n %s\n%s\n%s"%(i.nome_evento,i.sigla,i.local))
+            print("=-="*15)
+            print("Dados do Evento\nNome do evento:%s\nSigla:%s\nDescrição:%s\nLocal:%s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.local))
+            print("=-="*15)
         else:
             print("Sigla não encontrado nos eventos cadastrados!")
     def deslogar(self):
@@ -200,10 +208,12 @@ class Participante(Usuario):
                 if self.tipo == "PARTICIPANTE_ESTUDANTE":
                     evento.participantes.append(usuario)
                     evento.valor_arrecadado+=(evento.valor_estudante)
+                    Dados.valor_total+=(evento.valor_estudante)
                     print("Participante estudante inscrito com sucesso!")
                 elif self.tipo == "PARTICIPANTE_PROFISSIONAL":
                     evento.participantes.append(usuario)
                     evento.valor_arrecadado+=(evento.valor_profissional)
+                    Dados.valor_total+=(evento.valor_profissional)
                     print("Participante profissional inscrito com sucesso!")
         else:
             print("Sigla não encontrada no sistema!")
