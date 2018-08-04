@@ -19,6 +19,19 @@ class Evento(object):
         self.valor_profissional = valor_profissional
         self.valor_estudante = valor_estudante
         self.participantes = []
+        self.participantesEstudante = []
+        self.participantesProfissional = []
+    def classificarEstudante(self):
+        
+        for i in self.participantes:
+            if i.tipo=="PARTICIPANTE_ESTUDANTE":
+                self.participantesEstudante.append(i)
+        
+    def classificarProfissional(self):
+        
+        for i in self.participantes:
+            if i.tipo=="PARTICIPANTE_PROFISSIONAL":
+                self.participantesProfissional.append(i)
 class AdministradorSistema(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
@@ -45,15 +58,30 @@ class AdministradorSistema(Usuario):
             print("Essa sigla não está cadastrada em nenhum evento no nosso sistema!")
     def removerUsuario(self,cpf):
         excluido = False
-        for i in self.partc
+        for i in self.participantes:
+            if i.cpf == cpf:
+                self.participantes.remove(i)
+                excluido = True
+        if excluido==True:
+            print("Usuário removido com sucesso")
+        else:
+            print("CPF não encontrado como cadastrado!")
+        
     def listarEventos(self):
         for i in self.eventos:
             print(i.nome_eventos,"-",i.sigla)
     def relatorioSistema(self):
+        participantesEstudantes = 0
+        participantesProfissionais = 0
+        for i in self.participantes:
+            if i.tipo=="PARTICIPANTE_ESTUDANTE":
+                participanteEstudantes+=1
+            elif i.tipo=="PARTICIPANTE_PROFISSIONAL":
+                participanteProfissionais+=1
         print("Número de administradores do sistema: %i"%len(self.admSistema))
         print("Número de administradores de evento: %i"%len(self.admEvento))
-        print("Número de participantes Estudantes: %i"%len(self.participantesEstudante))
-        print("Número de participantes Profissionais: %i"%len(self.participantesProfissional))
+        print("Número de participantes Estudantes: %i"%participantesEstudantes)
+        print("Número de participantes Profissionais: %i"%participantesProfissionais)
         print("Número de eventos cadastrados: %i"%len(self.eventos))
         
     def relatorioEvento(self,sigla_evento):
@@ -62,9 +90,11 @@ class AdministradorSistema(Usuario):
             if i.sigla == sigla_evento:
                 evento = i
         print("Dados do Eventos:\n %s\n%s\n%s"%(i.nome,i.sigla,i.local))
+        if evento==None:
+            print("Sigla não encontrado nos eventos cadastrados!")
     def deslogar(self):
         main()
-class AdministradorEvento(AdministradorSistema):
+class AdministradorEvento(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
         self.tipo = None
@@ -85,6 +115,67 @@ class AdministradorEvento(AdministradorSistema):
             usuario.senha = senha
         else:
             print("Opção inválida")
+    
+        
+    def listarEventos(self,adm):
+        eventos = []
+        for i in adm.eventos:
+            if i.administrador_evento.cpf==self.cpf:
+                eventos.append(i)
+        for i in eventos:
+            print("Nome do evento: %s -- Sigla: %s"%(i.nome_evento,i.sigla))
+    def desinscreverUsuarioEvento(self,cpf,sigla,adm):
+        numero = 0
+        evento = None
+        removido = False
+        for i in adm.eventos:
+            if i.sigla==sigla:
+                evento = i
+            else:
+                
+                numero = 1
+        if evento.administrador_evento.cpf==self.cpf:
+            numero = 2
+        else:
+            print("Administrador não tem permissão do evento!")
+        for i in evento.participantes:
+            if i.cpf==cpf and numero==2:
+                evento.participantes.remove(i)
+                removido = True
+            else:
+                numero = 3
+                #CPF NÃO ENCONTRADA
+        if numero==1:
+            print("Sigla informada não encontrada!")
+        elif removido == True:
+            print("Usuário removido com sucesso!")
+        elif numero==3:
+            print("CPF não encontrado!")
+                
+    def relatorioEvento(self,sigla,adm):
+        evento = None
+        for i in adm.eventos:
+            if i.sigla==sigla:
+                evento = i
+        if evento.administrador_evento.cpf==self.cpf:
+           evento.classificarProfissional()
+           evento.classificarEstudante()
+           print("%s - %s\nLocal: %s\nDescrição:%s\nData Inicio:%s\nData fim:%s\nAdministrador Evento:%s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.data_inicio,evento.data_fim,self.nome))
+           print("CATEGORIA ESTUDANTE:")
+           for i in evento.participantesEstudante:
+                 print("Participantes Estudantes:")
+                 print("Nome: %s"%i.nome)
+           print("CATEGORIA ESTUDANTE:")
+           for i in evento.participantesProfissional:
+                 print("Participantes Profissionais:")
+                 print("Nome: %s"%i.nome)
+           print("Valor arrecadado:",evento.valor_arrecadado)
+        else:
+                 print("Administrador do evento não tem permissão!")
+                
+       
+                
+        
 class ParticipanteEstudante(Usuario):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
@@ -156,7 +247,7 @@ def validandoUsuario(adm):
         senha = input("Informe a senha:")
     usuario = Usuario(nome,cpf,endereco,data_nascimento,senha)
     return usuario
-def validandoLogin():
+def validandoLogin(adm):
     cpf = input("Insira seu CPF(Apenas Números):")
     senha = input("Insira sua senha:")
     objeto = None
@@ -207,31 +298,9 @@ def validandoEvento(adm):
                                             
     evento = Evento(nome_evento,sigla,descricao,local,data_inicio,data_fim,admEvento,valor_participante_profissional,valor_participante_estudante)
     return evento
-    
-def admSistema(objeto):
-    print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n8-Exibidr relatório por evento\n9-Deslogar")
-    if opcao==1:
-        usuario = validandoUsuario()
-        objeto.cadastrarAdmSistema(usuario)
-        print("ADM de Sistema cadastrado com sucesso!")
-    elif opcao==2:
-        usuario = validandoUsuario()
-        objeto.cadastrarAdmEvento(usuario)
-        print("AMD de Evento cadastrado com sucesso!")
-    elif opcao==3:
-        evento = validandoEvento(objeto)
-        objeto.cadastrarEvento(evento)
-        print("Evento cadastrado com sucesso")
-    elif opcao==4:
-        sigla = input("Informe a sigla do evento a ser excluído:")
-        objeto.removerEvento(sigla)
-    elif opcao==5:
-        cpf = input("Informe o cpf do usuario a ser excluído:")
-        objeto.removerUsuario(cpf)
-        
-    
+
 def main():
-    adm  = AdministradorSistema("ADM_MASTER","11111111111","Indefinido","08/05/1995","ADM_MASTER")
+    adm  = AdministradorSistema("ADM_MASTER","ADM_MASTER","ADM_MASTER","ADM_MASTER","ADM_MASTER")
     opcao = 4
     while opcao!=3:
         print("Bem vindo ao Sistema de Eventos!\n1-Criar Conta\n2-Realizar Login\n3-Sair do Sistema")
@@ -243,14 +312,14 @@ def main():
                 opcao = int(input("Escolha um tipo de usuário->"))
                 if opcao==1:
                     usuario = validandoUsuario(adm)
-                    admSistema = AministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                    admSistema = AdministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
                     admSistema.tipo = "ADM_SISTEMA"
                     adm.cadastrarAdmSistema(admSistema)
                     print("Administrador Sistema criado com sucesso!")
                 elif opcao==2:
                     usuario = validandoUsuario(adm)
                     admEvento = AdministradorEvento(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
-                    admdEvento.tipo = "ADM_EVENTO"
+                    admEvento.tipo = "ADM_EVENTO"
                     adm.cadastrarAdmEvento(admEvento)
                     print("Administrador Evento criado com sucesso!")
                 elif opcao==3:
@@ -266,12 +335,78 @@ def main():
                     adm.participantes.append(participanteProfissional)
                     print("Participante Profissional criado com sucesso!")
         elif opcao==2:
-            objeto = validandoLogin()
+            objeto = validandoLogin(adm)
             if objeto==None:
                 print("Login inválido")
             else:
                 if objeto.tipo=="ADM_SISTEMA":
-                    admSistema(objeto)
+                    
+                    
+                    opcao=11
+                    while opcao!=10:
+                        print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n8-Exibidr relatório por evento\n9-Deslogar\n10-Sair do sistema")
+                        opcao = int(input("Informe uma opção->"))
+                        if opcao==1:
+                            usuario = validandoUsuario(adm)
+                            objeto.cadastrarAdmSistema(usuario)
+                            print("ADM de Sistema cadastrado com sucesso!")
+                        elif opcao==2:
+                            usuario = validandoUsuario(adm)
+                            objeto.cadastrarAdmEvento(usuario)
+                            print("ADM de Evento cadastrado com sucesso!")
+                        elif opcao==3:
+                            evento = validandoEvento(objeto)
+                            objeto.cadastrarEvento(evento)
+                            print("Evento cadastrado com sucesso")
+                        elif opcao==4:
+                            sigla = input("Informe a sigla do evento a ser excluído:")
+                            objeto.removerEvento(sigla)
+                        elif opcao==5:
+                            cpf = input("Informe o cpf do usuario a ser excluído:")
+                            objeto.removerUsuario(cpf)
+                        elif opcao==6:
+                            objeto.listarEventos()
+                        elif opcao==7:
+                            objeto.relatorioSistema()
+                        elif opcao==8:
+                            sigla = input("Informe a sigla do evento a ser detalhado:")
+                            objeto.relatorioEvento(sigla)
+                        elif opcao==9:
+                            print("Usuário deslogado!")
+                            main()
+                elif objeto.tipo=="ADM_EVENTO":
+                    opcao ==11
+                    while opcao!=6:
+                        print("MENU DE ADMINISTRADOR DE EVENTOS\n1-Alterar dados pessoais\n2-Listar Eventos\n3-Desinscrever usuário do evento\n4-Exibir relatorio por evento\n5-Deslogar\n6-Sair do sistema")
+                        opcao = int(input("Insira uma opção->"))
+                        if opcao==1:
+                            print("O que deseja alterar?\n1-Nome\n2-Data de nascimento\n3-Endereço\n4-Senha\n")
+                            if opcao==1:
+                                nome = input("Informe seu nome:")
+                                objeto.nome = nome
+                            elif opcao==2:
+                                data_nascimento = input("Informe sua data de nascimento:")
+                                objeto.data_nascimento = data_nascimento
+                            elif opcao==3:
+                                endereco = input("Insira seu novo endereço:")
+                                objeto.endereco = endereco
+                            elif opcao==4:
+                                senha = input("Insira sua senha:")
+                                objeto.senha = senha
+                        elif opcao==2:
+                                 objeto.listarEventos()
+                        elif opcao==3:
+                                 cpf = input("Informe o cpf do usuário:")
+                                 sigla = input("Informe a sigla do evento:")
+                                 objeto.desinscreverUsuarioEvento(cpf,sigla,adm)
+                        elif opcao==4:
+                                 sigla = input("Insira a sigla do evento:")
+                                 objeto.relatorioEvento(sigla,adm)
+                        elif opcao==5:
+                                 print("Usuário deslogado!")
+                                 main()
+                
+                 
                 
             
                 
