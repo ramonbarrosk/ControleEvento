@@ -104,7 +104,8 @@ def validandoEvento():
     nome_evento = input("Insira o nome do evento(Mínimo 5 caracteres):")
     while len(nome_evento)<5:
         nome_evento = input("Insira o nome do evento(Mínimo 5 caracteres):")
-    sigla = input("Insira a sigla do evento(4 caracteres):")
+    sigla = input("Insira a sigla do evento(4 caracteres):").upper()
+    
     while len(sigla)!=4:
         sigla = input("Insira a sigla do evento(4 caracteres):")
     descricao = input("Insira a descrição do evento:")
@@ -157,37 +158,35 @@ def main():
                 print("1-Administrador Sistema\n2-Administrador Evento\n3-Participante Estudante\n4-Participante Profissional\n5-Menu Inicial")
                 try:
                     opcao = int(input("Escolha um tipo de usuário->"))
+                    if opcao==1:
+                        usuario = validandoUsuario()
+                        admSistema = AdministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                        admSistema.tipo = "ADM_SISTEMA"
+                        Dados.admSistema.append(admSistema)
+                        print("Administrador Sistema criado com sucesso!")
+                    elif opcao==2:
+                        usuario = validandoUsuario()
+                        admEvento = AdministradorEvento(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                        admEvento.tipo = "ADM_EVENTO"
+                        Dados.admEventos.append(admEvento)
+                        print("Administrador Evento criado com sucesso!")
+                    elif opcao==3:
+                        usuario = validandoUsuario()
+                        participanteEstudante = Participante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                        participanteEstudante.tipo = "PARTICIPANTE_ESTUDANTE"
+                        Dados.usuarios.append(participanteEstudante)
+                        print("Participante Estudante criado com sucesso!")
+                    elif opcao==4:
+                        usuario = validandoUsuario()
+                        participanteProfissional = Participante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
+                        participanteProfissional.tipo = "PARTICIPANTE_PROFISSIONAL"
+                        Dados.usuarios.append(participanteProfissional)
+                        print("Participante Profissional criado com sucesso!")
+                    elif opcao==5:
+                        main()
+                    else:
+                        print("Opção inválida!")
                 except ValueError:
-                    print("Opção inválida!")
-                    
-                    
-                if opcao==1:
-                    usuario = validandoUsuario()
-                    admSistema = AdministradorSistema(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
-                    admSistema.tipo = "ADM_SISTEMA"
-                    Dados.admSistema.append(admSistema)
-                    print("Administrador Sistema criado com sucesso!")
-                elif opcao==2:
-                    usuario = validandoUsuario()
-                    admEvento = AdministradorEvento(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
-                    admEvento.tipo = "ADM_EVENTO"
-                    Dados.admEventos.append(admEvento)
-                    print("Administrador Evento criado com sucesso!")
-                elif opcao==3:
-                    usuario = validandoUsuario()
-                    participanteEstudante = Participante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
-                    participanteEstudante.tipo = "PARTICIPANTE_ESTUDANTE"
-                    Dados.usuarios.append(participanteEstudante)
-                    print("Participante Estudante criado com sucesso!")
-                elif opcao==4:
-                    usuario = validandoUsuario()
-                    participanteProfissional = Participante(usuario.nome,usuario.cpf,usuario.endereco,usuario.data_nascimento,usuario.senha)
-                    participanteProfissional.tipo = "PARTICIPANTE_PROFISSIONAL"
-                    Dados.usuarios.append(participanteProfissional)
-                    print("Participante Profissional criado com sucesso!")
-                elif opcao==5:
-                    main()
-                else:
                     print("Opção inválida!")
                         
         elif opcao==2:
@@ -198,115 +197,102 @@ def main():
                 if objeto.tipo=="ADM_SISTEMA":
                     print("=-="*10)
                     opcao=11
-                    while opcao!=10:
+                    while opcao!=9:
                         print("MENU DE ADMINISTRADOR DE SISTEMA\n1-Cadastrar Administrador de Sistema\n2-Cadastrar Administrador de Evento\n"
                                   +"3-Cadastrar Evento\n4-Remover Evento\n5-Remover Usuário\n6-Listar Eventos\n7-Exibir Relatório do Sistema\n"
-                                  +"8-Exibir relatório por evento\n9-Deslogar\n10-Sair do sistema")
+                                  +"8-Exibir relatório por evento\n9-Deslogar")
                         try:
                             opcao = int(input("Informe uma opção->"))
+                        
+                            if opcao==1:
+                                usuario = validandoUsuario()
+                                Dados.admSistema.append(usuario)
+                                print("ADM de Sistema cadastrado com sucesso!")
+                            elif opcao==2:
+                                usuario = validandoUsuario()
+                                Dados.admEventos.append(usuario)
+                                print("ADM de Evento cadastrado com sucesso!")
+                            elif opcao==3:
+                                evento = validandoEvento()
+                                Dados.eventos.append(evento)
+                                print("Evento cadastrado com sucesso")
+                            elif opcao==4:
+                                sigla = input("Informe a sigla do evento a ser excluído:").upper()
+                                objeto.removerEvento(sigla)
+                            elif opcao==5:
+                                cpf = input("Informe o cpf do usuario a ser excluído:")
+                                objeto.removerUsuario(cpf)
+                            elif opcao==6:
+                                objeto.listarEventos()
+                            elif opcao==7:
+                                objeto.relatorioSistema()
+                            elif opcao==8:
+                                sigla = input("Informe a sigla do evento a ser detalhado:").upper()
+                                objeto.relatorioEvento(sigla)
+                            elif opcao==9:
+                                pass
+                            else:
+                                print("Opção inválida!")
                         except ValueError:
                             print("Opção inválida!")
-                        if opcao==1:
-                            usuario = validandoUsuario()
-                            Dados.admSistema.append(usuario)
-                            print("ADM de Sistema cadastrado com sucesso!")
-                        elif opcao==2:
-                            usuario = validandoUsuario()
-                            Dados.admEventos.append(usuario)
-                            print("ADM de Evento cadastrado com sucesso!")
-                        elif opcao==3:
-                            evento = validandoEvento()
-                            Dados.eventos.append(evento)
-                            print("Evento cadastrado com sucesso")
-                        elif opcao==4:
-                            sigla = input("Informe a sigla do evento a ser excluído:")
-                            objeto.removerEvento(sigla)
-                        elif opcao==5:
-                            cpf = input("Informe o cpf do usuario a ser excluído:")
-                            objeto.removerUsuario(cpf)
-                        elif opcao==6:
-                            objeto.listarEventos()
-                        elif opcao==7:
-                            objeto.relatorioSistema()
-                        elif opcao==8:
-                            sigla = input("Informe a sigla do evento a ser detalhado:")
-                            objeto.relatorioEvento(sigla)
-                        elif opcao==9:
-                            print("Usuário deslogado!")
-                            main()
+                    print("Usuário deslogado!")
+                        
                 elif objeto.tipo=="ADM_EVENTO":
                     print("=-="*10)
                     opcao ==11
-                    while opcao!=6:
+                    while opcao!=5:
                         print("MENU DE ADMINISTRADOR DE EVENTOS\n1-Alterar dados pessoais\n2-Listar Eventos\n"
-                                  +"3-Desinscrever usuário do evento\n4-Exibir relatorio por evento\n5-Deslogar\n6-Sair do sistema")
+                                  +"3-Desinscrever usuário do evento\n4-Exibir relatorio por evento\n5-Deslogar")
                         try:
                             opcao = int(input("Insira uma opção->"))
+                        
+                            if opcao==1:
+                                objeto.alterarDadosPessoais()
+                            elif opcao==2:
+                                objeto.listarEventos()
+                            elif opcao==3:
+                                cpf = input("Informe o cpf do usuário:")
+                                sigla = input("Informe a sigla do evento:").upper()
+                                objeto.desinscreverUsuarioEvento(cpf,sigla)
+                            elif opcao==4:
+                                sigla = input("Insira a sigla do evento:").upper()
+                                objeto.relatorioEvento(sigla)
+                            elif opcao==5:
+                                print("Usuário deslogado!")
+                                main()
+                            else:
+                                print("Opção inválida!")
                         except ValueError:
                             print("Opção inválida!")
-                        if opcao==1:
-                            print("O que deseja alterar?\n1-Nome\n2-Data de nascimento\n3-Endereço\n4-Senha\n")
-                            if opcao==1:
-                                nome = input("Informe seu nome:")
-                                objeto.nome = nome
-                            elif opcao==2:
-                                data_nascimento = input("Informe sua data de nascimento:")
-                                objeto.data_nascimento = data_nascimento
-                            elif opcao==3:
-                                endereco = input("Insira seu novo endereço:")
-                                objeto.endereco = endereco
-                            elif opcao==4:
-                                senha = input("Insira sua senha:")
-                                objeto.senha = senha
-                        elif opcao==2:
-                            objeto.listarEventos()
-                        elif opcao==3:
-                            cpf = input("Informe o cpf do usuário:")
-                            sigla = input("Informe a sigla do evento:")
-                            objeto.desinscreverUsuarioEvento(cpf,sigla)
-                        elif opcao==4:
-                            sigla = input("Insira a sigla do evento:")
-                            objeto.relatorioEvento(sigla)
-                        elif opcao==5:
-                            print("Usuário deslogado!")
-                            main()
+                    print("Usuário deslogado!")
                 elif objeto.tipo=="PARTICIPANTE_ESTUDANTE" or objeto.tipo=="PARTICIPANTE_PROFISSIONAL":
                     print("=-="*10)
                     opcao == 11
-                    while opcao!=6:
+                    while opcao!=5:
                         print("MENU DO PARTICIPANTE\n1-Alterar dados pessoais\n2-Listar Eventos inscritos\n3-Detalhar evento\n"
-                                  +"4-Realizar Inscrição evento\n5-Deslogar\n6-Sair do sistema")
+                                  +"4-Realizar Inscrição evento\n5-Deslogar")
                         try:
                             opcao = int(input("Escolha uma opção:"))
                         except ValueError:
                             print("Opção inválida1")
                         if opcao==1:
-                            
-                            print("O que deseja alterar?\n1-Nome\n2-Data de nascimento\n3-Endereço\n4-Senha\n")
-                            opcao = int(input("Escolha uma opção:"))
-                            if opcao==1:
-                                nome = input("Informe seu nome:")
-                                objeto.nome = nome
-                            elif opcao==2:
-                                data_nascimento = input("Informe sua data de nascimento:")
-                                objeto.data_nascimento = data_nascimento
-                            elif opcao==3:
-                                endereco = input("Insira seu novo endereço:")
-                                objeto.endereco = endereco
-                            elif opcao==4:
-                                senha = input("Insira sua senha:")
-                                objeto.senha = senha
+                            objeto.alterarDadosPessoais()
                         elif opcao==2:
                             
                             objeto.listarEventosInscritos()
                         elif opcao==3:
-                            sigla = input("Insira a sigla do evento a ser detalhado:")
+                            sigla = input("Insira a sigla do evento a ser detalhado:").upper()
                             objeto.detalheEvento(sigla)
                         elif opcao==4:
-                            sigla = input("Insira a sigla do evento no qual quer se inscrever:")
+                            sigla = input("Insira a sigla do evento no qual quer se inscrever:").upper()
                             objeto.realizarInscricaoEvento(sigla)
                         elif opcao==5:
                             main()
+                        elif opcao==9:
+                            break
+                        else:
+                            print("Opção inválida!")
+                    print("Usuário deslogado!")
     
         elif opcao==3:
             print("Volte sempre!")
