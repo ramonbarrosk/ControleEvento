@@ -92,7 +92,8 @@ class AdministradorSistema(Usuario):
         if evento!=None:
             print("=-="*15)
             print("Dados do Evento\nNome do evento: %s\nSigla: %s\nDescrição: %s\nLocal: %s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.local))
-            print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s\n"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
+            print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
+            print("Valor por estudante: %.2f\nValor por profissional: %.2f"%(evento.valor_estudante,evento.valor_profissional))
             print("Valor arrecadado:%.2f"%evento.valor_arrecadado)
             print("Participantes estudantes")
             for i in evento.participantes:
@@ -102,11 +103,10 @@ class AdministradorSistema(Usuario):
             for i in evento.participantes:
                 if i.tipo=="PARTICIPANTE_PROFISSIONAL":
                     print("Nome do participante: %s"%i.nome)
-            
         else:
             print("Sigla não encontrada no sistema!")
         print("=-="*15)
-class AdministradorEvento(Usuario):
+class AdministradorEvento(AdministradorSistema):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
         Usuario.__init__(self,nome,cpf,endereco,data_nascimento,senha)
         self.tipo = None
@@ -161,6 +161,32 @@ class AdministradorEvento(Usuario):
         except ValueError:
             print("Opção inválida!")
         print("=-="*15)
+    def relatorioEvento(self,sigla_evento):
+        print("=-="*15)
+        evento = None 
+        for i in Dados.eventos:
+            if i.sigla == sigla_evento:
+                evento = i
+        if evento!=None:
+            if evento.administrador_evento.cpf==self.cpf:
+                print("=-="*15)
+                print("Dados do Evento\nNome do evento: %s\nSigla: %s\nDescrição: %s\nLocal: %s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.local))
+                print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
+                print("Valor por estudante: %.2f\nValor por profissional: %.2f"%(evento.valor_estudante,evento.valor_profissional))
+                print("Valor arrecadado:%.2f"%evento.valor_arrecadado)
+                print("Participantes estudantes")
+                for i in evento.participantes:
+                    if i.tipo == "PARTICIPANTE_ESTUDANTE":
+                        print("Nome do participante: %s"%i.nome)
+                print("Participantes profissionais")
+                for i in evento.participantes:
+                    if i.tipo=="PARTICIPANTE_PROFISSIONAL":
+                        print("Nome do participante: %s"%i.nome)
+            else:
+                print("Você não tem permissão para ver esse evento!")
+        else:
+            print("Sigla não encontrada no sistema!")
+        print("=-="*15)
     def listarEventos(self):
         print("=-="*15)
         eventos = []
@@ -181,6 +207,7 @@ class AdministradorEvento(Usuario):
             if evento.administrador_evento.cpf==self.cpf:
                 for i in Dados.usuarios:
                     if i.cpf==cpf:
+                        Dados.usuarios.remove(i)
                         removido = True
             else:
                 print("Administrador não tem permissão nesse evento!")
@@ -190,31 +217,6 @@ class AdministradorEvento(Usuario):
             print("Usuário removido com sucesso!")
         else:
             print("CPF não encontrado no sistema!")
-        print("=-="*15)
-    def relatorioEvento(self,sigla):
-        print("=-="*15)
-        evento = None
-        for i in Dados.eventos:
-            if i.sigla==sigla:
-                evento = i
-        if evento!=None:
-            if evento.administrador_evento.cpf==self.cpf:
-                print("Dados do Evento\nNome do evento: %s\nSigla: %s\nDescrição: %s\nLocal: %s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.local))
-                print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s\n"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
-                print("Valor arrecadado:%.2f"%evento.valor_arrecadado)
-                print("Participantes estudantes")
-                for i in evento.participantes:
-                    if i.tipo == "PARTICIPANTE_ESTUDANTE":
-                        print("Nome do participante: %s"%i.nome)
-                print("Participantes profissionais")
-                for i in evento.participantes:
-                    if i.tipo=="PARTICIPANTE_PROFISSIONAL":
-                        print("Nome do participante: %s"%i.nome)
-            
-            else:
-                     print("Você não tem permissão para esse evento!")
-        else:
-            print("Sigla não encontrada no sistema!")
         print("=-="*15)
 class Participante(AdministradorEvento):
     def __init__(self,nome,cpf,endereco,data_nascimento,senha):
@@ -238,7 +240,8 @@ class Participante(AdministradorEvento):
                 evento = i
         if evento!=None:
             print("Dados do Evento\nNome do evento: %s\nSigla: %s\nDescrição: %s\nLocal: %s"%(evento.nome_evento,evento.sigla,evento.descricao,evento.local))
-            print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s\n"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
+            print("Data de início: %s\nData de fim: %s\nAdministrador do evento: %s"%(evento.data_inicio,evento.data_fim,evento.administrador_evento.nome))
+            print("Valor por estudante: %.2f\nValor por profissional: %.2f"%(evento.valor_estudante,evento.valor_profissional))
         else:
             print("Sigla não encontrada no sistema!")
         print("=-="*15)
